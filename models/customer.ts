@@ -1,6 +1,7 @@
 import { ObjectFormatter } from "../utilities";
+import { ICustomer } from "./icustomer";
 
-class Customer {
+class Customer implements ICustomer {
     constructor(public customerId: number,
         public customerName: string, public address: string,
         public email: string, public phone: string,

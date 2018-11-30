@@ -1,36 +1,38 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const db_management_1 = require("./db-management");
-const config_1 = require("./config");
+const hosting_1 = require("./hosting");
+const DEFAULT_LISTENER_PORT = 8899;
+const DEFAULT_HTTP_ONLY = false;
+const DEFAULT_KEY_FILE = './key.pem';
+const DEFAULT_CERT_FILE = './cert.pem';
+const DEFAULT_PASS_PHRASE = 'Prestige123$$/?';
+const DEFAULT_GLOBAL_SECRET_KEY = "Lam Research, Bangalore";
 class MainClass {
     static main() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                let connectionString = config_1.Configuration.getConfiguration().getConnectionString();
-                yield db_management_1.Mongoose.connect(connectionString, {
-                    useNewUrlParser: true
-                });
-                let filteredCustomers = yield db_management_1.CustomerModel.find({ customerName: /Boll/i });
-                for (let customer of filteredCustomers) {
-                    console.log(customer.customerId + ', ' +
-                        customer.customerName);
-                }
-            }
-            catch (error) {
-                console.error(`Error Occurred, Details : ${JSON.stringify(error)}`);
-            }
-            finally {
-                yield db_management_1.Mongoose.disconnect();
-            }
-        });
+        let portNumber = parseInt(process.env.LISTENER_PORT || '') || DEFAULT_LISTENER_PORT;
+        let httpsEnabled = (process.env.ENABLE_HTTPS || '') === 'true' || DEFAULT_HTTP_ONLY;
+        let certificateDetails = {
+            KEY_FILE: process.env.KEY_FILE || DEFAULT_KEY_FILE,
+            CERT_FILE: process.env.CERT_FILE || DEFAULT_CERT_FILE,
+            PASS_PHRASE: process.env.PASS_PHRASE || DEFAULT_PASS_PHRASE
+        };
+        let authenticationDetails = {
+            globalSecretKey: process.env.GLOBAL_SECRET_KEY || DEFAULT_GLOBAL_SECRET_KEY
+        };
+        let hosting = new hosting_1.SingleNodeHosting(portNumber, httpsEnabled, certificateDetails, authenticationDetails);
+        let shutdown = () => {
+            hosting
+                .stop()
+                .then(() => {
+                console.info('REST Service Stopped Successfully!');
+                process.exit();
+            });
+        };
+        process.on('exit', shutdown);
+        process.on('SIGINT', shutdown);
+        hosting
+            .start()
+            .then(() => console.info('REST Service Started Successfully!'));
     }
 }
 MainClass.main();
