@@ -104,7 +104,7 @@ class CustomerService implements ICustomerService {
 
             let addedRecord = await CustomerModel.create(customerRecord);
 
-            status = addedRecord !== null && addedRecord._id;
+            status = addedRecord !== null && addedRecord._id != null;
         } catch (error) {
             throw error;
         } finally {

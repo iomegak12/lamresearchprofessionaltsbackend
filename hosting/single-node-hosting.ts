@@ -86,7 +86,18 @@ class SingleNodeHosting {
         }
     }
 
+    private applyCors(request: express.Request, response: express.Response,
+        next: express.NextFunction): void {
+        response.header('Access-Control-Allow-Credentials', 'true');
+        response.header('Access-Control-Allow-Origin', '*');
+        response.header('Access-Control-Allow-Methods', '*');
+        response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+        next();
+    }
+
     private configureMiddleware(): void {
+        this.app.use(this.applyCors);
         this.app.use(
             (error: any, request: any, response: any, next: any) => {
                 if (error && error.constructor.name === 'UnauthorizedError') {
