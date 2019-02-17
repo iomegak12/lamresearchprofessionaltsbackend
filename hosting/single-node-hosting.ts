@@ -39,8 +39,8 @@ class SingleNodeHosting {
 
         this.globalSecretKey = authenticationDetails.globalSecretKey;
 
-        if (!this.globalSecretKey)
-            throw new Error(INVALID_AUTH_SECRET_KEY);
+        //if (!this.globalSecretKey)
+        //    throw new Error(INVALID_AUTH_SECRET_KEY);
 
         this.portNumber = portNumber;
         this.app = express();
@@ -110,12 +110,13 @@ class SingleNodeHosting {
             });
 
         this.app.use(bodyParser.json());
+        /*
         this.app.use(CUSTOMERS_API, expressJwt({
             secret: this.globalSecretKey
         }));
-
+        */
         this.app.use(CUSTOMERS_API, this.customerRouting.Router);
-        this.app.use(AUTH_API, this.authenticationRouting.Router);
+        // this.app.use(AUTH_API, this.authenticationRouting.Router);
         this.app.use(PUBLIC_ROOT, express.static('public'));
     }
 
