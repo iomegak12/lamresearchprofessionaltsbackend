@@ -98,6 +98,7 @@ class SingleNodeHosting {
 
     private configureMiddleware(): void {
         this.app.use(this.applyCors);
+        /*
         this.app.use(
             (error: any, request: any, response: any, next: any) => {
                 if (error && error.constructor.name === 'UnauthorizedError') {
@@ -108,7 +109,7 @@ class SingleNodeHosting {
 
                 next();
             });
-
+        */
         this.app.use(bodyParser.json());
         /*
         this.app.use(CUSTOMERS_API, expressJwt({
